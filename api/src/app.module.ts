@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { LoggerModule } from 'nestjs-pino';
 import { PaymentsModule } from './payments/payments.module';
+import { WebhooksModule } from './webhooks/webhooks.module';
+import { WorkerModule } from './worker/worker.module';
 
 @Module({
     imports: [
@@ -12,6 +14,8 @@ import { PaymentsModule } from './payments/payments.module';
             },
         }),
         PaymentsModule,
+        WebhooksModule,
+        WorkerModule
     ],
 })
 export class AppModule { }
