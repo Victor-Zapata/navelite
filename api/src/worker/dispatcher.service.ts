@@ -57,26 +57,33 @@ export class DispatcherService implements OnModuleInit {
         });
 
         try {
-            await this.breakerFor(url).exec(() =>
-                withRetry(async () => {
-                    const res = await fetch(url, {
-                        method: 'POST',
-                        headers: {
-                            'content-type': 'application/json',
-                            'x-navelite-signature': sign(payload, secret),
-                        },
-                        body: payload,
-                        signal: AbortSignal.timeout(5000),
-                    });
-                    if (!res.ok) throw new Error(`merchant returned ${res.status}`);
-                }, { attempts: 3, baseMs: 300 }),
+            await withRetry(
+                () =>
+                    this.breakerFor(url).exec(async () => {
+                        const res = await fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'content-type': 'application/json',
+                                'x-navelite-signature': sign(payload, secret),
+                            },
+                            body: payload,
+                            signal: AbortSignal.timeout(5000),
+                        });
+                        if (!res.ok) throw new Error(`merchant returned ${res.status}`);
+                    }),
+                { attempts: 3, baseMs: 300 },
             );
 
             await markPublished(evt.pk, evt.sk);
             this.logger.log({ msg: 'event delivered', type: evt.eventType, paymentId: evt.paymentId });
         } catch (e: any) {
             await markFailed(evt.pk, evt.sk, e.message);
-            this.logger.warn({ msg: 'delivery failed', paymentId: evt.paymentId, detail: e.message });
+            this.logger.warn({
+                msg: 'delivery failed',
+                paymentId: evt.paymentId,
+                detail: e.message,
+                breaker: this.breakerFor(url).status,
+            });
         }
     }
 }
