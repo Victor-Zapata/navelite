@@ -1,0 +1,5 @@
+node_modules/
+dist/
+.dynamo-data/
+.env
+.env.local

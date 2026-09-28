@@ -1,11 +1,11 @@
+import 'dotenv/config';
 import { DynamoDBClient, ListTablesCommand, DescribeTableCommand } from '@aws-sdk/client-dynamodb';
 
 const endpoint = 'http://127.0.0.1:8000';
 
 const client = new DynamoDBClient({
-    region: 'us-east-1',
-    endpoint,
-    credentials: { accessKeyId: 'local', secretAccessKey: 'local' },
+    region: process.env.AWS_REGION ?? 'us-east-1',
+    ...(process.env.DYNAMO_ENDPOINT ? { endpoint: process.env.DYNAMO_ENDPOINT } : {}),
 });
 
 async function main() {

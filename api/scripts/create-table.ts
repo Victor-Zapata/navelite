@@ -1,9 +1,9 @@
+import 'dotenv/config';
 import { CreateTableCommand, DynamoDBClient } from '@aws-sdk/client-dynamodb';
 
 const client = new DynamoDBClient({
-    region: 'us-east-1',
-    endpoint: 'http://localhost:8000',
-    credentials: { accessKeyId: 'local', secretAccessKey: 'local' },
+    region: process.env.AWS_REGION ?? 'us-east-1',
+    ...(process.env.DYNAMO_ENDPOINT ? { endpoint: process.env.DYNAMO_ENDPOINT } : {}),
 });
 
 async function main() {

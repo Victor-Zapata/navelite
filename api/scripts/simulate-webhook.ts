@@ -16,8 +16,8 @@ async function main() {
         processorRef: `proc_${Date.now()}`,
         occurredAt: new Date().toISOString(),
     });
-
-    const res = await fetch('http://127.0.0.1:3000/v1/webhooks/processor', {
+    const base = process.env.API_URL ?? 'http://127.0.0.1:3000';
+    const res = await fetch(`${base}/v1/webhooks/processor`, {
         method: 'POST',
         headers: {
             'content-type': 'application/json',
