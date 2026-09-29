@@ -73,12 +73,41 @@ export function PaymentDetail({ id, onChanged }: { id: string; onChanged: () => 
                         </tr>
                         <tr><td>Arancel</td><td className="neg">−{money(b.feeCents)}</td></tr>
                         <tr><td>IVA sobre arancel</td><td className="neg">−{money(b.vatOnFeeCents)}</td></tr>
+
+                        {payment.status === 'refunded' && (
+                            <tr>
+                                <td>Devolución al cliente</td>
+                                <td className="neg">−{money(b.amountCents)}</td>
+                            </tr>
+                        )}
+
                         <tr className="total">
-                            <td>Neto a acreditar el {b.settlementDate}</td>
-                            <td>{money(b.netToMerchantCents)}</td>
+                            <td>
+                                {payment.status === 'refunded'
+                                    ? 'Resultado de la operación'
+                                    : payment.status === 'failed'
+                                        ? 'No se acredita'
+                                        : payment.status === 'captured'
+                                            ? `Neto a acreditar el ${b.settlementDate}`
+                                            : `Neto estimado si se acredita (${b.settlementDate})`}
+                            </td>
+                            <td className={payment.status === 'refunded' ? 'neg' : undefined}>
+                                {payment.status === 'refunded'
+                                    ? `−${money(b.feeCents + b.vatOnFeeCents)}`
+                                    : payment.status === 'failed'
+                                        ? money(0)
+                                        : money(b.netToMerchantCents)}
+                            </td>
                         </tr>
                     </tbody>
                 </table>
+            )}
+
+            {payment.status === 'refunded' && (
+                <p className="muted small note">
+                    El arancel y su IVA no se reintegran en una devolución: la operación
+                    deja al comercio con saldo negativo.
+                </p>
             )}
 
             {next && (

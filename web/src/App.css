@@ -298,3 +298,109 @@ button.primary {
   max-width: 560px;
   margin-inline: auto;
 }
+
+.note {
+  margin-top: 12px;
+  line-height: 1.45;
+}
+
+@media (max-width: 640px) {
+  .app {
+    padding: 20px 14px 40px;
+  }
+
+  .header {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .header h1 {
+    font-size: 22px;
+  }
+
+  .card {
+    padding: 15px;
+    border-radius: 8px;
+  }
+
+  .form-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .form-row label {
+    width: 100%;
+  }
+
+  input,
+  select {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .form-row button {
+    width: 100%;
+  }
+
+  .table {
+    display: block;
+  }
+
+  .table thead {
+    display: none;
+  }
+
+  .table tbody,
+  .table tr,
+  .table td {
+    display: block;
+    width: 100%;
+  }
+
+  .row {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 10px;
+  }
+
+  .row td {
+    border: 0;
+    padding: 2px 0;
+  }
+
+  .row td:nth-child(2)::before {
+    content: 'Monto · ';
+    color: var(--muted);
+  }
+
+  .row td:nth-child(3)::before {
+    content: 'Cuotas · ';
+    color: var(--muted);
+  }
+
+  .row:hover td,
+  .row--active td {
+    background: transparent;
+  }
+
+  .row--active {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+
+  .breakdown td {
+    font-size: 14px;
+    padding: 8px 0;
+  }
+
+  .detail-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .small,
+  .muted.small {
+    word-break: break-all;
+  }
+}
