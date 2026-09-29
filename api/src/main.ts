@@ -14,7 +14,11 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
   );
-  app.enableCors({ origin: 'http://localhost:5173' });
+  const origins = (process.env.CORS_ORIGINS ?? 'http://localhost:5173')
+    .split(',')
+    .map((o) => o.trim());
+
+  app.enableCors({ origin: origins, credentials: false });
   await app.listen(process.env.PORT ?? 3000, '0.0.0.0');
 }
 bootstrap();

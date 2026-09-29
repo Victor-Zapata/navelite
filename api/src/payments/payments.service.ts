@@ -44,7 +44,7 @@ export class PaymentsService {
             ...payment,
             breakdown,
             qr: `00020101021243650016ar.com.navelite0111${id}`,
-            checkoutUrl: `http://localhost:5173/checkout/${id}`,
+            checkoutUrl: `${process.env.PUBLIC_WEB_URL ?? 'http://localhost:5173'}/checkout/${id}`,
         };
     }
 
@@ -68,5 +68,23 @@ export class PaymentsService {
             }),
         );
         return res.Items ?? [];
+    }
+    async timeline(id: string) {
+        const res = await ddb.send(
+            new QueryCommand({
+                TableName: TABLE,
+                KeyConditionExpression: 'pk = :p AND begins_with(sk, :e)',
+                ExpressionAttributeValues: { ':p': `PAY#${id}`, ':e': 'EVT#' },
+                ScanIndexForward: true,
+            }),
+        );
+        return (res.Items ?? []).map((i) => ({
+            id: i.sk,
+            type: i.eventType,
+            createdAt: i.createdAt,
+            publishedAt: i.publishedAt ?? null,
+            attempts: i.attempts ?? 0,
+            lastError: i.lastError ?? null,
+        }));
     }
 }

@@ -4,11 +4,12 @@ import {
     Headers,
     HttpCode,
     Logger,
+    Param,
     Post,
     Req,
     UnauthorizedException,
 } from '@nestjs/common';
-import { verifySignature } from './signature';
+import { verifySignature, sign } from './signature';
 import { transitionAndEmit } from '../payments/outbox';
 import { PaymentStatus } from '../payments/domain/payment';
 
@@ -68,4 +69,29 @@ export class WebhooksController {
         this.logger.log({ msg: 'merchant sink received', type: body?.type, paymentId: body?.paymentId });
         return { ok: true };
     }
+
+    @Post('simulate/:paymentId/:event')
+    @HttpCode(200)
+    async simulate(@Param('paymentId') paymentId: string, @Param('event') event: string) {
+        const secret = process.env.WEBHOOK_SECRET ?? 'whsec_dev_only_change_me';
+        const body = JSON.stringify({
+            paymentId,
+            event: `payment.${event}`,
+            processorRef: `proc_${Date.now()}`,
+            occurredAt: new Date().toISOString(),
+        });
+
+        const base = process.env.SELF_URL ?? 'http://127.0.0.1:3000';
+        const res = await fetch(`${base}/v1/webhooks/processor`, {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json',
+                'x-navelite-signature': sign(body, secret),
+            },
+            body,
+        });
+
+        return { simulated: true, status: res.status, result: await res.json() };
+    }
+
 }

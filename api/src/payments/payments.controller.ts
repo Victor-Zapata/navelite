@@ -22,5 +22,10 @@ export class PaymentsController {
     list(@Query('merchantId') merchantId: string) {
         return this.payments.listByMerchant(merchantId);
     }
+
+    @Get(':id/events')
+    events(@Param('id') id: string) {
+        return this.payments.timeline(id);
+    }
 }
 
